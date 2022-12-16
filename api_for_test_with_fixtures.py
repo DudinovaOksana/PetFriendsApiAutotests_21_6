@@ -1,9 +1,9 @@
 import requests
-from requests_toolbelt import MultipartEncoder
 
-from 21_6_decorator import post_api_logger, get_api_logger, put_api_logger, delete_api_logger
-from 21_6_settings_with_fixtures import valid_email, valid_password
-import settings
+from requests_toolbelt.multipart.encoder import MultipartEncoder
+
+import settings_with_fixtures
+from decorator import post_api_logger, get_api_logger, put_api_logger, delete_api_logger
 
 
 @post_api_logger
@@ -12,7 +12,7 @@ def post_request(url, headers, data):
 
 
 @get_api_logger
-def get_request(url, headers, params):
+def get_request(url, headers, params=None):
     return requests.get(url=url, headers=headers, params=params)
 
 
@@ -28,18 +28,16 @@ def put_request(url, headers, data, path):
     return requests.put(url=url, headers=headers, data=data)
 
 
-
-
 class PetFriendsDecorator:
     def __init__(self):
-        self.base_url = settings.base_url
+        self.base_url = settings_with_fixtures.base_url
 
     def get_api_key(self, email, password):
         headers = {
             "email": email,
             'password': password
         }
-        res = requests.get(self.base_url + 'api/key', headers=headers)
+        res = get_request(self.base_url + 'api/key', headers=headers)
         status = res.status_code
         try:
             result = res.json()['key']
@@ -47,10 +45,11 @@ class PetFriendsDecorator:
             result = res.text
         return status, result
 
+
     def get_list_of_pets(self, auth_key, filter):
         headers = {'auth_key': auth_key}
 
-        res = get_request(self.base_url + 'api/pets', headers=headers, params=filter)
+        res = get_request(self.base_url + 'api/pets', headers=headers, params="filter="+filter)
 
         status = res.status_code
         try:
@@ -58,6 +57,7 @@ class PetFriendsDecorator:
         except:
             result = res.text
         return status, result
+
 
     def add_new_pet_with_photo(self, auth_key, name, animal_type, age, pet_photo):
         data = MultipartEncoder(
@@ -77,6 +77,7 @@ class PetFriendsDecorator:
             result = res.text
         return status, result, response_head
 
+
     def add_new_pet_simple_without_photo(self, auth_key, name, animal_type, age):
         data = MultipartEncoder(
             fields={
@@ -85,13 +86,14 @@ class PetFriendsDecorator:
                 "age": age,
             })
         headers = {'auth_key': auth_key, 'Content-Type': data.content_type}
-        res = post_request(self.base_url + '/api/create_pet_simple', headers=headers, data=data)
+        res = post_request(self.base_url + 'api/create_pet_simple', headers=headers, data=data)
         status = res.status_code
         try:
             result = res.json()
         except:
             result = res.text
         return status, result
+
 
     def set_pet_photo(self, auth_key, pet_id, pet_photo):
         data = MultipartEncoder(
@@ -108,6 +110,7 @@ class PetFriendsDecorator:
             result = res.text
         return status, result
 
+
     def change_pet(self, auth_key, pet_id, name, animal_type, age):
         data = MultipartEncoder(
             fields={
@@ -116,7 +119,7 @@ class PetFriendsDecorator:
                 "age": age,
             })
         headers = {'auth_key': auth_key, 'Content-Type': data.content_type}
-        res = put_request(self.base_url + '/api/pets/', headers=headers, data=data, path=pet_id)
+        res = put_request(self.base_url + 'api/pets/', headers=headers, data=data, path=pet_id)
         status = res.status_code
         response_head = res.headers
         try:
@@ -124,6 +127,7 @@ class PetFriendsDecorator:
         except:
             result = res.text
         return status, result, response_head
+
 
     def delete_pet(self, auth_key, pet_id):
         headers = {'auth_key': auth_key}
@@ -136,6 +140,7 @@ class PetFriendsDecorator:
         except:
             result = res.text
         return status, result, response_head
+
 
     def add_new_pet_simple_without_photo_without_animal_type_field(self, auth_key, name, age):
         data = MultipartEncoder(
