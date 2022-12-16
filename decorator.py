@@ -5,10 +5,7 @@ def cut_down_long_data_from_pets_json(json):
         list_of_pets = json["pets"]
     except KeyError:
         list_of_pets = [json]
-    count = 0
     for i in list_of_pets:
-        count += 1
-        print(f"number of beast: {count}")
         if len(i["pet_photo"]) > 22:
             i["pet_photo"] = i["pet_photo"][:22]
         if len(i["age"])>4:
