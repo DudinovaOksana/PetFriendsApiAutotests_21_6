@@ -3,9 +3,9 @@ from datetime import datetime
 import pytest
 
 from api_for_test_with_fixtures import PetFriendsDecorator
-from settings_with_fixtures import invalid_email
-from settings_with_fixtures import valid_email
-from settings_with_fixtures import valid_password
+from settings import invalid_email
+from settings import valid_email
+from settings import valid_password
 
 pf = PetFriendsDecorator()
 

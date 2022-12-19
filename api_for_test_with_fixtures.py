@@ -2,7 +2,7 @@ import requests
 
 from requests_toolbelt.multipart.encoder import MultipartEncoder
 
-import settings_with_fixtures
+import settings
 from decorator import post_api_logger, get_api_logger, put_api_logger, delete_api_logger
 
 
